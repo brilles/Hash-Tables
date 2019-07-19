@@ -1,8 +1,3 @@
-
-
-# '''
-# Linked List hash table key/value pair
-# '''
 class LinkedPair:
     def __init__(self, key, value):
         self.key = key
@@ -10,55 +5,133 @@ class LinkedPair:
         self.next = None
 
 
-# '''
-# Fill this in
-
-# Resizing hash table
-# '''
 class HashTable:
     def __init__(self, capacity):
-        pass
+        self.capacity = capacity
+        self.storage = [None] * capacity
 
 
-# '''
-# Research and implement the djb2 hash function
-# '''
 def hash(string, max):
-    pass
+    hash = 5381
+    for i in string:
+        hash = ((hash << 5) + hash) + ord(i)
+    return hash % max
 
 
-# '''
-# Fill this in.
-
-# Hint: Used the LL to handle collisions
-# '''
 def hash_table_insert(hash_table, key, value):
-    pass
+    # store index
+    index = hash(key, hash_table.capacity)
+
+    # create LinkedPair with key/value
+    item = LinkedPair(key, value)
+
+    # store the pair at the index
+    stored_pair = hash_table.storage[index]
+
+    # if there is no collision
+    if stored_pair is None:
+        # insert
+        hash_table.storage[index] = item
+        return
+
+    # if there is a collision
+    else:
+        # if the keys are the same => overwrite it
+        if stored_pair.key == key:
+            stored_pair.value = value
+            return
+        else:
+            # traverse the LL
+            while stored_pair.next is not None:
+
+                # re-assign the stored_pair
+                stored_pair = stored_pair.next
+
+                # if the keys are the same => overwrite it
+                if stored_pair.key == key:
+                    stored_pair.value = value
+                    return
+            # if not, append
+            stored_pair.next = item
+            return
 
 
 # '''
-# Fill this in.
 
 # If you try to remove a value that isn't there, print a warning.
 # '''
 def hash_table_remove(hash_table, key):
-    pass
+    # store index
+    index = hash(key, hash_table.capacity)
 
+    # store the pair at the index
+    stored_pair = hash_table.storage[index]
+
+    # if not found
+    if stored_pair is None:
+        print(f"Warning: no item at that index, nothing removed")
+        return
+
+    # only one node in LL (n -> None)
+    if stored_pair.next is None and stored_pair.key == key:
+        hash_table.storage[index] = None
+        return None
+
+    # store nth stored_pair
+    nth_sp = hash_table.storage[index].next
+
+    # traverse the LL
+    while nth_sp is not None:
+
+        if nth_sp.key is key:
+
+            # reassign the LL node
+            stored_pair.next = nth_sp.next
+            return
+
+        # keep traversing
+        stored_pair = nth_sp
+        nth_sp = nth_sp.next
 
 # '''
-# Fill this in.
-
 # Should return None if the key is not found.
 # '''
+
+
 def hash_table_retrieve(hash_table, key):
-    pass
+    # store index
+    index = hash(key, hash_table.capacity)
+
+    # store the pair at the index
+    stored_pair = hash_table.storage[index]
+
+    # traverse the LL
+    while stored_pair is not None:
+
+        if stored_pair.key is key:
+
+            return stored_pair.value
+        # keep traversing
+        stored_pair = stored_pair.next
+    return None
 
 
-# '''
-# Fill this in
-# '''
 def hash_table_resize(hash_table):
-    pass
+    # create new hash table with double the capacity
+    resized_HT = HashTable(hash_table.capacity * 2)
+
+    # iterate first HT and insert into second
+    for i in hash_table.storage:
+        stored_pair = i
+
+        # traverse LL
+        while stored_pair is not None:
+
+            # insert
+            hash_table_insert(resized_HT, stored_pair.key, stored_pair.value)
+
+            stored_pair = stored_pair.next
+    return resized_HT
 
 
 def Testing():
